@@ -28,12 +28,15 @@
             color: #ffffff;
             user-select: none;
         }
-        .slot-reel {
-            transition: transform 0.1s ease-out;
-        }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between p-6 overflow-hidden">
+<body class="min-h-screen flex flex-col justify-between p-6 overflow-hidden relative">
+
+    <!-- BİLDİRİM BALONU (/pay için) -->
+    <div id="notification" class="fixed top-6 right-6 bg-purple-600 text-white px-6 py-3 rounded-2xl shadow-2xl font-bold translate-y-[-150%] transition-transform duration-300 z-50 flex items-center gap-3 border border-purple-400/40">
+        <span class="w-2.5 h-2.5 rounded-full bg-emerald-400 animate-ping"></span>
+        <span id="notification-text">Ödül Gönderildi!</span>
+    </div>
 
     <!-- ÜST KISIM: KolicHub Başlık -->
     <header class="text-center py-2">
@@ -132,7 +135,6 @@
             const izleyiciCard = document.getElementById('izleyici-card');
             const rollBtn = document.getElementById('roll-btn');
 
-            // Kart stillerini sıfırla
             bizCard.className = "bg-cardbg border-2 border-slate-800 rounded-3xl p-8 flex flex-col items-center shadow-2xl relative transition-all duration-300";
             izleyiciCard.className = "bg-cardbg border-2 border-slate-800 rounded-3xl p-8 flex flex-col items-center shadow-2xl relative transition-all duration-300";
             resultText.innerText = "Sayılar Çekiliyor...";
@@ -187,14 +189,38 @@
             }
         });
 
-        // /pay komut işleyicisi
+        // /pay [isim] komut işleyicisi ve bildirim gösterimi
         function executePay() {
             const input = document.getElementById('pay-input');
-            const val = input.value.trim();
-            if (val) {
-                alert(`Ödül gönderildi: ${val}`);
-                input.value = '';
+            let val = input.value.trim();
+            if (!val) return;
+
+            // Eğer kullanıcı doğrudan isim yerine /pay isim yazdıysa ayıkla
+            if (val.startsWith('/pay')) {
+                val = val.replace('/pay', '').trim();
             }
+
+            if (!val) return;
+
+            showNotification(`Ödül Gönderildi: ${val}`);
+            input.value = '';
+        }
+
+        // Enter tuşu ile /pay gönderme
+        document.getElementById('pay-input').addEventListener('keydown', (e) => {
+            if (e.key === 'Enter') {
+                executePay();
+            }
+        });
+
+        function showNotification(text) {
+            const notif = document.getElementById('notification');
+            const notifText = document.getElementById('notification-text');
+            notifText.innerText = text;
+            notif.style.transform = 'translateY(0)';
+            setTimeout(() => {
+                notif.style.transform = 'translateY(-150%)';
+            }, 3000);
         }
     </script>
 </body>
