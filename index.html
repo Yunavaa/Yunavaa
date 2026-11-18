@@ -1,462 +1,201 @@
-```html
 <!DOCTYPE html>
 <html lang="tr" class="dark">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KolicGB | Yayın Sayı Düellosu</title>
-    <!-- Tailwind CSS -->
+    <title>KolicHub | Sayı Düellosu</title>
     <script src="https://cdn.tailwindcss.com"></script>
-    <!-- Google Fonts: Inter & JetBrains Mono -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600;700;800;900&family=JetBrains+Mono:wght@700;800&display=swap" rel="stylesheet">
-    <!-- Font Awesome İkonlar -->
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;700;800&display=swap" rel="stylesheet">
     <script>
         tailwind.config = {
             darkMode: 'class',
             theme: {
                 extend: {
-                    fontFamily: {
-                        sans: ['Inter', 'sans-serif'],
-                        mono: ['JetBrains Mono', 'monospace'],
-                    },
                     colors: {
-                        obsidian: '#0b0e14',
+                        darkbg: '#0b0e14',
                         cardbg: '#131823',
-                        borderdark: '#232a3b',
-                        clean: '#10b981',     // Kazanan Yeşil
-                        dirty: '#ef4444',     // Kaybeden Kızıl
-                        accent: '#8b5cf6',    // Kolic Moru
-                        gold: '#f59e0b'       // Altın Vurgu
+                        accent: '#8b5cf6',
+                        accenthover: '#7c3aed'
                     }
                 }
             }
         }
     </script>
-
     <style>
         body {
+            font-family: 'Plus Jakarta Sans', sans-serif;
             background-color: #0b0e14;
-            color: #f3f4f6;
+            color: #ffffff;
             user-select: none;
-            background-image: 
-                radial-gradient(circle at 15% 20%, rgba(139, 92, 246, 0.08) 0%, transparent 45%),
-                radial-gradient(circle at 85% 80%, rgba(139, 92, 246, 0.07) 0%, transparent 45%);
         }
-
-        /* Neon Parlamalar */
-        .glow-purple {
-            box-shadow: 0 0 30px rgba(139, 92, 246, 0.35);
+        .slot-reel {
+            transition: transform 0.1s ease-out;
         }
-        .glow-win {
-            border-color: #10b981 !important;
-            box-shadow: 0 0 45px rgba(16, 185, 129, 0.38), inset 0 0 28px rgba(16, 185, 129, 0.14);
-        }
-        .glow-gold-win {
-            border-color: #f59e0b !important;
-            box-shadow: 0 0 45px rgba(245, 158, 11, 0.38), inset 0 0 28px rgba(245, 158, 11, 0.14);
-        }
-        .glow-draw {
-            border-color: #8b5cf6 !important;
-            box-shadow: 0 0 35px rgba(139, 92, 246, 0.35), inset 0 0 20px rgba(139, 92, 246, 0.12);
-        }
-
-        /* Slot Makinesi Sayı Titreşimi */
-        @keyframes slotRoll {
-            0%, 100% { transform: translateY(0) scale(1); }
-            25% { transform: translateY(-6px) scale(1.05); }
-            75% { transform: translateY(6px) scale(1.05); }
-        }
-        .slot-spinning {
-            animation: slotRoll 0.12s infinite linear;
-            filter: blur(0.6px);
-        }
-
-        /* Sonuç Oturma Efekti */
-        @keyframes popLand {
-            0% { transform: scale(1.35); }
-            65% { transform: scale(0.94); }
-            100% { transform: scale(1); }
-        }
-        .land-pop {
-            animation: popLand 0.35s cubic-bezier(0.22, 1, 0.36, 1) forwards;
-        }
-
-        /* Özel Kaydırma Çubuğu */
-        ::-webkit-scrollbar { width: 6px; height: 6px; }
-        ::-webkit-scrollbar-track { background: #0b0e14; }
-        ::-webkit-scrollbar-thumb { background: #232a3b; border-radius: 9999px; }
-        ::-webkit-scrollbar-thumb:hover { background: #8b5cf6; }
     </style>
 </head>
-<body class="min-h-screen flex flex-col justify-between font-sans overflow-x-hidden">
+<body class="min-h-screen flex flex-col justify-between p-6 overflow-hidden">
 
-    <!-- ================= ÜST BAŞLIK & SKOR SAYACI ================= -->
-    <header class="bg-cardbg/90 backdrop-blur-md border-b border-borderdark px-4 sm:px-8 py-4">
-        <div class="max-w-5xl mx-auto flex flex-wrap items-center justify-between gap-4">
-            
-            <!-- Marka Logosu -->
-            <div class="flex items-center gap-3">
-                <div class="w-11 h-11 rounded-2xl bg-gradient-to-br from-accent to-purple-900 flex items-center justify-center text-white text-xl font-black shadow-lg glow-purple border border-purple-400/30">
-                    <i class="fa-solid fa-crown"></i>
-                </div>
-                <div>
-                    <h1 class="text-lg sm:text-xl font-black tracking-tight text-white">
-                        KOLIC<span class="text-accent">GB</span> <span class="text-gray-600 mx-1">/</span> SAYI DÜELLOSU
-                    </h1>
-                    <p class="text-[11px] text-gray-400 font-semibold tracking-wide">1 - 9 Arası &bull; Yüksek Sayı Kazanır</p>
-                </div>
-            </div>
-
-            <!-- Skor Sayacı & Sıfırlama -->
-            <div class="flex items-center gap-3 bg-obsidian border border-borderdark px-4 py-2 rounded-2xl shadow-inner">
-                <div class="flex items-center gap-2.5 text-xs sm:text-sm font-extrabold">
-                    <span class="text-gray-400 uppercase tracking-wider">SKOR:</span>
-                    <span id="label-score-biz" class="text-clean">BİZ</span>
-                    <span id="score-biz" class="font-mono text-xl sm:text-2xl font-black text-white bg-cardbg px-2.5 py-0.5 rounded-lg border border-borderdark">0</span>
-                    <span class="text-gray-500 font-black">-</span>
-                    <span id="score-izleyici" class="font-mono text-xl sm:text-2xl font-black text-white bg-cardbg px-2.5 py-0.5 rounded-lg border border-borderdark">0</span>
-                    <span id="label-score-izleyici" class="text-gold">İZLEYİCİ</span>
-                </div>
-
-                <div class="h-6 w-[1px] bg-borderdark mx-1"></div>
-
-                <button onclick="resetAll()" title="Skoru ve Geçmişi Sıfırla"
-                    class="text-xs font-bold text-gray-400 hover:text-white bg-cardbg hover:bg-accent/20 border border-borderdark hover:border-accent/50 px-3 py-2 rounded-xl transition active:scale-95 flex items-center gap-1.5 cursor-pointer">
-                    <i class="fa-solid fa-rotate-right"></i>
-                    <span class="hidden sm:inline">Sıfırla</span>
-                </button>
-            </div>
+    <!-- ÜST KISIM: KolicHub Başlık -->
+    <header class="text-center py-2">
+        <div class="inline-flex items-center gap-2 px-6 py-2 rounded-2xl bg-cardbg border border-slate-800/80 shadow-xl">
+            <span class="w-3 h-3 rounded-full bg-emerald-500 animate-pulse"></span>
+            <h1 class="text-2xl font-extrabold tracking-wider bg-gradient-to-r from-purple-400 via-indigo-300 to-purple-600 bg-clip-text text-transparent">
+                KOLICHUB GAMBLE
+            </h1>
         </div>
     </header>
 
-    <!-- ================= ORTA DÜELLO ARENASI ================= -->
-    <main class="flex-1 max-w-5xl w-full mx-auto px-4 py-6 flex flex-col items-center justify-center gap-6">
+    <!-- ORTA KISIM: Sayı Düellosu Alanı -->
+    <main class="flex-1 flex flex-col items-center justify-center max-w-4xl mx-auto w-full gap-8 my-auto">
+        
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8 w-full">
+            
+            <!-- BİZ TARAFI -->
+            <div id="biz-card" class="bg-cardbg border-2 border-slate-800 rounded-3xl p-8 flex flex-col items-center shadow-2xl relative transition-all duration-300">
+                <div class="absolute -top-4 bg-purple-600 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest text-white shadow-lg">
+                    Biz
+                </div>
+                <div class="mb-4 w-full text-center">
+                    <input type="text" value="Biz" class="text-xl font-bold bg-transparent text-center border-b border-transparent hover:border-slate-600 focus:border-purple-500 focus:outline-none w-full py-1 text-purple-300">
+                </div>
+                <div class="h-32 w-32 bg-[#090b10] border border-slate-800 rounded-2xl flex items-center justify-center shadow-inner my-2 overflow-hidden relative">
+                    <span id="biz-number" class="text-7xl font-black text-white drop-shadow-[0_0_15px_rgba(139,92,246,0.5)]">?</span>
+                </div>
+                <span class="text-xs text-slate-500 mt-2 font-medium">1 - 9 Arası Sayı</span>
+            </div>
 
-        <!-- Büyük Sonuç Göstergesi -->
-        <div id="result-banner" class="w-full max-w-3xl bg-cardbg/90 border-2 border-borderdark rounded-2xl py-4 px-6 text-center transition-all duration-300 shadow-xl">
-            <div id="result-text" class="text-xl sm:text-3xl font-black tracking-wider text-gray-300 uppercase">
-                DÜELLOYA HAZIR
+            <!-- İZLEYİCİ TARAFI -->
+            <div id="izleyici-card" class="bg-cardbg border-2 border-slate-800 rounded-3xl p-8 flex flex-col items-center shadow-2xl relative transition-all duration-300">
+                <div class="absolute -top-4 bg-indigo-600 px-4 py-1 rounded-full text-xs font-bold uppercase tracking-widest text-white shadow-lg">
+                    İzleyici
+                </div>
+                <div class="mb-4 w-full text-center">
+                    <input type="text" value="İzleyici" class="text-xl font-bold bg-transparent text-center border-b border-transparent hover:border-slate-600 focus:border-indigo-500 focus:outline-none w-full py-1 text-indigo-300">
+                </div>
+                <div class="h-32 w-32 bg-[#090b10] border border-slate-800 rounded-2xl flex items-center justify-center shadow-inner my-2 overflow-hidden relative">
+                    <span id="izleyici-number" class="text-7xl font-black text-white drop-shadow-[0_0_15px_rgba(99,102,241,0.5)]">?</span>
+                </div>
+                <span class="text-xs text-slate-500 mt-2 font-medium">1 - 9 Arası Sayı</span>
             </div>
-            <div id="result-subtext" class="text-xs text-gray-400 font-medium mt-1">
-                Sayı çekmek için ortadaki butona bas veya <kbd class="bg-obsidian border border-borderdark px-2 py-0.5 rounded text-accent font-mono">SPACE</kbd> tuşuna dokun
-            </div>
+
         </div>
 
-        <!-- İki Büyük Kart ve Ortadaki Aksiyon Alanı -->
-        <div class="w-full grid grid-cols-1 md:grid-cols-12 gap-5 items-center">
-
-            <!-- SOL KART: BİZ -->
-            <div id="card-biz" class="md:col-span-5 bg-cardbg border-2 border-borderdark rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-between gap-5 transition-all duration-300 shadow-2xl relative overflow-hidden">
-                <div class="w-full flex items-center justify-between">
-                    <span class="text-[11px] font-extrabold uppercase tracking-widest text-accent bg-accent/15 border border-accent/30 px-3 py-1 rounded-full">
-                        <i class="fa-solid fa-crown mr-1"></i> BİZİM TARAF
-                    </span>
-                    <span id="status-biz" class="text-xs font-black uppercase text-gray-500 tracking-wider">BEKLİYOR</span>
-                </div>
-
-                <!-- Düzenlenebilir İsim Kutusu -->
-                <div class="w-full relative group">
-                    <input id="name-biz" type="text" value="BİZ" maxlength="16" oninput="syncScoreLabels()"
-                        class="w-full bg-obsidian/90 hover:bg-obsidian focus:bg-obsidian border border-borderdark focus:border-accent rounded-2xl py-2.5 px-4 text-center font-black text-xl sm:text-2xl text-white uppercase tracking-wide outline-none transition">
-                    <i class="fa-solid fa-pen text-xs text-gray-500 group-hover:text-accent absolute right-4 top-4 pointer-events-none transition"></i>
-                </div>
-
-                <!-- 1-9 Slot Sayı Ekranı -->
-                <div class="w-44 h-44 sm:w-52 sm:h-52 rounded-3xl bg-obsidian border-2 border-borderdark flex items-center justify-center shadow-inner relative overflow-hidden">
-                    <div class="absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-black/70 to-transparent pointer-events-none z-10"></div>
-                    <span id="num-biz" class="font-mono font-black text-8xl sm:text-9xl text-white tracking-tighter">?</span>
-                    <div class="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-black/70 to-transparent pointer-events-none z-10"></div>
-                </div>
+        <!-- DURUM MESAJI VE TETİKLEYİCİ -->
+        <div class="flex flex-col items-center gap-4 w-full">
+            <div id="result-text" class="text-2xl font-extrabold tracking-wide text-slate-400 h-8 flex items-center justify-center">
+                Düello Bekleniyor...
             </div>
-
-            <!-- ORTA BÖLÜM: VS & SAYI ÇEK BUTONU -->
-            <div class="md:col-span-2 flex flex-col items-center justify-center gap-4 my-2">
-                <div class="w-12 h-12 rounded-2xl bg-cardbg border border-accent/40 flex items-center justify-center font-black text-sm text-accent shadow-lg glow-purple">
-                    VS
-                </div>
-
-                <button id="roll-btn" onclick="startDuel()"
-                    class="w-full md:w-auto px-6 py-5 rounded-2xl bg-gradient-to-b from-accent to-purple-700 hover:from-purple-500 hover:to-purple-600 text-white font-black text-base sm:text-lg uppercase tracking-wider shadow-2xl glow-purple border border-purple-400/40 transition transform active:scale-95 flex flex-col items-center justify-center gap-1.5 cursor-pointer">
-                    <i class="fa-solid fa-dice text-2xl"></i>
-                    <span class="leading-tight text-center">SAYI<br class="hidden md:inline"> ÇEK</span>
-                </button>
-            </div>
-
-            <!-- SAĞ KART: İZLEYİCİ -->
-            <div id="card-izleyici" class="md:col-span-5 bg-cardbg border-2 border-borderdark rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-between gap-5 transition-all duration-300 shadow-2xl relative overflow-hidden">
-                <div class="w-full flex items-center justify-between">
-                    <span class="text-[11px] font-extrabold uppercase tracking-widest text-gold bg-gold/15 border border-gold/30 px-3 py-1 rounded-full">
-                        <i class="fa-solid fa-user-astronaut mr-1"></i> RAKİP TARAF
-                    </span>
-                    <span id="status-izleyici" class="text-xs font-black uppercase text-gray-500 tracking-wider">BEKLİYOR</span>
-                </div>
-
-                <!-- Düzenlenebilir İzleyici İsim Kutusu -->
-                <div class="w-full relative group">
-                    <input id="name-izleyici" type="text" value="İZLEYİCİ" maxlength="16" oninput="syncScoreLabels()"
-                        class="w-full bg-obsidian/90 hover:bg-obsidian focus:bg-obsidian border border-borderdark focus:border-accent rounded-2xl py-2.5 px-4 text-center font-black text-xl sm:text-2xl text-white uppercase tracking-wide outline-none transition">
-                    <i class="fa-solid fa-pen text-xs text-gray-500 group-hover:text-accent absolute right-4 top-4 pointer-events-none transition"></i>
-                </div>
-
-                <!-- 1-9 Slot Sayı Ekranı -->
-                <div class="w-44 h-44 sm:w-52 sm:h-52 rounded-3xl bg-obsidian border-2 border-borderdark flex items-center justify-center shadow-inner relative overflow-hidden">
-                    <div class="absolute inset-x-0 top-0 h-8 bg-gradient-to-b from-black/70 to-transparent pointer-events-none z-10"></div>
-                    <span id="num-izleyici" class="font-mono font-black text-8xl sm:text-9xl text-white tracking-tighter">?</span>
-                    <div class="absolute inset-x-0 bottom-0 h-8 bg-gradient-to-t from-black/70 to-transparent pointer-events-none z-10"></div>
-                </div>
-            </div>
+            <button onclick="startDuel()" id="roll-btn" class="bg-gradient-to-r from-purple-600 to-indigo-600 hover:from-purple-500 hover:to-indigo-500 text-white font-extrabold text-lg px-12 py-4 rounded-2xl shadow-lg shadow-purple-500/20 active:scale-95 transition-all cursor-pointer border border-purple-400/30">
+                SAYI ÇEK (SPACE)
+            </button>
         </div>
+
     </main>
 
-    <!-- ================= ALT GEÇMİŞ ŞERİDİ (SON DÜELLOLAR) ================= -->
-    <footer class="bg-cardbg/90 border-t border-borderdark px-4 sm:px-8 py-4">
-        <div class="max-w-5xl mx-auto flex flex-col sm:flex-row items-center gap-3">
-            <div class="flex items-center gap-2 text-xs font-extrabold uppercase tracking-wider text-accent shrink-0">
-                <i class="fa-solid fa-clock-rotate-left"></i>
-                <span>Son Düellolar:</span>
-            </div>
-            <div id="history-list" class="flex items-center gap-2.5 overflow-x-auto w-full pb-1 sm:pb-0">
-                <span class="text-xs text-gray-500 italic">Henüz düello yapılmadı...</span>
-            </div>
+    <!-- ALT KISIM: Tie Sayacı ve /pay İsim Komutu -->
+    <footer class="w-full max-w-4xl mx-auto flex flex-col sm:flex-row items-center justify-between gap-4 pt-4 border-t border-slate-800/60 text-sm">
+        
+        <!-- Tie Sayacı -->
+        <div class="flex items-center gap-3 bg-cardbg px-5 py-2.5 rounded-xl border border-slate-800 shadow-lg">
+            <span class="text-slate-400 font-semibold">Berabere (Tie):</span>
+            <span id="tie-count" class="text-amber-400 font-extrabold text-lg">0</span>
         </div>
+
+        <!-- /pay İsim Komut Paneli -->
+        <div class="flex items-center gap-2 w-full sm:w-auto">
+            <div class="relative flex-1 sm:w-72">
+                <input type="text" id="pay-input" placeholder="/pay isim" class="w-full bg-cardbg border border-slate-800 rounded-xl px-4 py-2.5 text-sm text-slate-200 placeholder-slate-500 focus:outline-none focus:border-purple-500 shadow-inner">
+            </div>
+            <button onclick="executePay()" class="bg-slate-800 hover:bg-slate-700 text-slate-200 font-bold px-5 py-2.5 rounded-xl border border-slate-700 transition-all cursor-pointer">
+                Gönder
+            </button>
+        </div>
+
     </footer>
 
-    <!-- ================= JAVASCRIPT OYUN & SLOT ANİMASYONU ================= -->
     <script>
         let isRolling = false;
-        let bizScore = 0;
-        let izleyiciScore = 0;
-        let duelHistory = [];
+        let tieScore = 0;
 
-        // 1 ile 9 arası rastgele tam sayı üretir
-        function randomDigit() {
+        function getRandomNumber() {
             return Math.floor(Math.random() * 9) + 1;
         }
 
-        // Kart isimleri değiştikçe üst skor etiketlerini günceller
-        function syncScoreLabels() {
-            const bName = document.getElementById('name-biz').value.trim() || 'BİZ';
-            const iName = document.getElementById('name-izleyici').value.trim() || 'İZLEYİCİ';
-            document.getElementById('label-score-biz').textContent = bName.toUpperCase();
-            document.getElementById('label-score-izleyici').textContent = iName.toUpperCase();
-        }
-
-        // Kartların neon parlamalarını temizler
-        function clearCardEffects() {
-            const cardBiz = document.getElementById('card-biz');
-            const cardIzl = document.getElementById('card-izleyici');
-            const numBiz = document.getElementById('num-biz');
-            const numIzl = document.getElementById('num-izleyici');
-
-            cardBiz.className = 'md:col-span-5 bg-cardbg border-2 border-borderdark rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-between gap-5 transition-all duration-300 shadow-2xl relative overflow-hidden';
-            cardIzl.className = 'md:col-span-5 bg-cardbg border-2 border-borderdark rounded-3xl p-6 sm:p-8 flex flex-col items-center justify-between gap-5 transition-all duration-300 shadow-2xl relative overflow-hidden';
-
-            numBiz.className = 'font-mono font-black text-8xl sm:text-9xl text-white tracking-tighter';
-            numIzl.className = 'font-mono font-black text-8xl sm:text-9xl text-white tracking-tighter';
-        }
-
-        // Slot makinesi gibi yavaşlayarak duran düello fonksiyonu
         function startDuel() {
             if (isRolling) return;
             isRolling = true;
 
-            const rollBtn = document.getElementById('roll-btn');
-            const numBizEl = document.getElementById('num-biz');
-            const numIzlEl = document.getElementById('num-izleyici');
-            const banner = document.getElementById('result-banner');
+            const bizSpan = document.getElementById('biz-number');
+            const izleyiciSpan = document.getElementById('izleyici-number');
             const resultText = document.getElementById('result-text');
-            const resultSub = document.getElementById('result-subtext');
+            const bizCard = document.getElementById('biz-card');
+            const izleyiciCard = document.getElementById('izleyici-card');
+            const rollBtn = document.getElementById('roll-btn');
 
+            // Kart stillerini sıfırla
+            bizCard.className = "bg-cardbg border-2 border-slate-800 rounded-3xl p-8 flex flex-col items-center shadow-2xl relative transition-all duration-300";
+            izleyiciCard.className = "bg-cardbg border-2 border-slate-800 rounded-3xl p-8 flex flex-col items-center shadow-2xl relative transition-all duration-300";
+            resultText.innerText = "Sayılar Çekiliyor...";
+            resultText.className = "text-2xl font-extrabold tracking-wide text-purple-400 animate-pulse h-8 flex items-center justify-center";
             rollBtn.disabled = true;
-            rollBtn.classList.add('opacity-60', 'cursor-not-allowed');
+            rollBtn.classList.add('opacity-50', 'cursor-not-allowed');
 
-            clearCardEffects();
-            numBizEl.classList.add('slot-spinning');
-            numIzlEl.classList.add('slot-spinning');
+            let counter = 0;
+            const interval = setInterval(() => {
+                bizSpan.innerText = getRandomNumber();
+                izleyiciSpan.innerText = getRandomNumber();
+                counter++;
 
-            document.getElementById('status-biz').textContent = 'DÖNÜYOR...';
-            document.getElementById('status-biz').className = 'text-xs font-black uppercase text-accent tracking-wider';
-            document.getElementById('status-izleyici').textContent = 'DÖNÜYOR...';
-            document.getElementById('status-izleyici').className = 'text-xs font-black uppercase text-accent tracking-wider';
+                if (counter > 15) {
+                    clearInterval(interval);
+                    
+                    const finalBiz = getRandomNumber();
+                    const finalIzleyici = getRandomNumber();
 
-            banner.className = 'w-full max-w-3xl bg-cardbg border-2 border-accent rounded-2xl py-4 px-6 text-center transition-all duration-300 shadow-xl glow-purple';
-            resultText.className = 'text-xl sm:text-3xl font-black tracking-wider text-accent uppercase';
-            resultText.textContent = 'SAYILAR ÇEKİLİYOR...';
-            resultSub.textContent = '1 - 9 arası şans sayıları dönüyor';
+                    bizSpan.innerText = finalBiz;
+                    izleyiciSpan.innerText = finalIzleyici;
 
-            // Nihai sayıları belirle (1-9)
-            const finalBiz = randomDigit();
-            const finalIzleyici = randomDigit();
+                    if (finalBiz > finalIzleyici) {
+                        resultText.innerText = "BİZ KAZANDIK!";
+                        resultText.className = "text-2xl font-extrabold tracking-wide text-emerald-400 h-8 flex items-center justify-center";
+                        bizCard.classList.add('border-emerald-500', 'shadow-[0_0_30px_rgba(16,185,129,0.2)]');
+                    } else if (finalIzleyici > finalBiz) {
+                        resultText.innerText = "İZLEYİCİ KAZANDI!";
+                        resultText.className = "text-2xl font-extrabold tracking-wide text-indigo-400 h-8 flex items-center justify-center";
+                        izleyiciCard.classList.add('border-indigo-500', 'shadow-[0_0_30px_rgba(99,102,241,0.2)]');
+                    } else {
+                        tieScore++;
+                        document.getElementById('tie-count').innerText = tieScore;
+                        resultText.innerText = "BERABERE (TIE)!";
+                        resultText.className = "text-2xl font-extrabold tracking-wide text-amber-400 h-8 flex items-center justify-center";
+                        bizCard.classList.add('border-amber-500');
+                        izleyiciCard.classList.add('border-amber-500');
+                    }
 
-            // Yavaşlayan slot adımları (ms)
-            const delays = [40, 45, 50, 60, 75, 90, 110, 135, 165, 200, 250, 310];
-            let step = 0;
-
-            function spinStep() {
-                if (step < delays.length) {
-                    let r1 = randomDigit();
-                    let r2 = randomDigit();
-                    if (r1 === Number(numBizEl.textContent)) r1 = (r1 % 9) + 1;
-                    if (r2 === Number(numIzlEl.textContent)) r2 = (r2 % 9) + 1;
-
-                    numBizEl.textContent = r1;
-                    numIzlEl.textContent = r2;
-
-                    const currentDelay = delays[step];
-                    step++;
-                    setTimeout(spinStep, currentDelay);
-                } else {
-                    resolveDuel(finalBiz, finalIzleyici);
+                    isRolling = false;
+                    rollBtn.disabled = false;
+                    rollBtn.classList.remove('opacity-50', 'cursor-not-allowed');
                 }
-            }
-
-            spinStep();
+            }, 80);
         }
 
-        function resolveDuel(bizVal, izlVal) {
-            const rollBtn = document.getElementById('roll-btn');
-            const cardBiz = document.getElementById('card-biz');
-            const cardIzl = document.getElementById('card-izleyici');
-            const numBizEl = document.getElementById('num-biz');
-            const numIzlEl = document.getElementById('num-izleyici');
-            const banner = document.getElementById('result-banner');
-            const resultText = document.getElementById('result-text');
-            const resultSub = document.getElementById('result-subtext');
-
-            const bizName = document.getElementById('name-biz').value.trim() || 'BİZ';
-            const izlName = document.getElementById('name-izleyici').value.trim() || 'İZLEYİCİ';
-
-            numBizEl.classList.remove('slot-spinning');
-            numIzlEl.classList.remove('slot-spinning');
-
-            numBizEl.textContent = bizVal;
-            numIzlEl.textContent = izlVal;
-
-            numBizEl.classList.add('land-pop');
-            numIzlEl.classList.add('land-pop');
-
-            let outcome = 'draw';
-
-            if (bizVal > izlVal) {
-                // BİZ KAZANDIK (Yeşil Neon)
-                outcome = 'biz';
-                bizScore++;
-                cardBiz.classList.add('glow-win');
-                numBizEl.classList.replace('text-white', 'text-clean');
-                numIzlEl.classList.replace('text-white', 'text-gray-500');
-
-                document.getElementById('status-biz').textContent = 'KAZANDI';
-                document.getElementById('status-biz').className = 'text-xs font-black uppercase text-clean tracking-wider';
-                document.getElementById('status-izleyici').textContent = 'KAYBETTİ';
-                document.getElementById('status-izleyici').className = 'text-xs font-black uppercase text-gray-500 tracking-wider';
-
-                banner.className = 'w-full max-w-3xl bg-clean/15 border-2 border-clean rounded-2xl py-4 px-6 text-center transition-all duration-300 shadow-xl glow-win';
-                resultText.className = 'text-2xl sm:text-4xl font-black tracking-wider text-clean uppercase';
-                resultText.textContent = 'KAZANDIN!';
-                resultSub.textContent = `${bizName} (${bizVal}) — (${izlVal}) ${izlName}`;
-            } else if (izlVal > bizVal) {
-                // İZLEYİCİ KAZANDI (Altın Neon)
-                outcome = 'izleyici';
-                izleyiciScore++;
-                cardIzl.classList.add('glow-gold-win');
-                numIzlEl.classList.replace('text-white', 'text-gold');
-                numBizEl.classList.replace('text-white', 'text-gray-500');
-
-                document.getElementById('status-izleyici').textContent = 'KAZANDI';
-                document.getElementById('status-izleyici').className = 'text-xs font-black uppercase text-gold tracking-wider';
-                document.getElementById('status-biz').textContent = 'KAYBETTİ';
-                document.getElementById('status-biz').className = 'text-xs font-black uppercase text-gray-500 tracking-wider';
-
-                banner.className = 'w-full max-w-3xl bg-gold/15 border-2 border-gold rounded-2xl py-4 px-6 text-center transition-all duration-300 shadow-xl glow-gold-win';
-                resultText.className = 'text-2xl sm:text-4xl font-black tracking-wider text-gold uppercase';
-                resultText.textContent = `${izlName.toUpperCase()} KAZANDI!`;
-                resultSub.textContent = `${bizName} (${bizVal}) — (${izlVal}) ${izlName}`;
-            } else {
-                // BERABERE (Mor Neon)
-                outcome = 'draw';
-                cardBiz.classList.add('glow-draw');
-                cardIzl.classList.add('glow-draw');
-                numBizEl.classList.replace('text-white', 'text-accent');
-                numIzlEl.classList.replace('text-white', 'text-accent');
-
-                document.getElementById('status-biz').textContent = 'BERABERE';
-                document.getElementById('status-biz').className = 'text-xs font-black uppercase text-accent tracking-wider';
-                document.getElementById('status-izleyici').textContent = 'BERABERE';
-                document.getElementById('status-izleyici').className = 'text-xs font-black uppercase text-accent tracking-wider';
-
-                banner.className = 'w-full max-w-3xl bg-accent/15 border-2 border-accent rounded-2xl py-4 px-6 text-center transition-all duration-300 shadow-xl glow-draw';
-                resultText.className = 'text-2xl sm:text-4xl font-black tracking-wider text-accent uppercase';
-                resultText.textContent = 'BERABERE!';
-                resultSub.textContent = `İki taraf da ${bizVal} attı — Tekrar sayı çek!`;
-            }
-
-            // Skorları Güncelle
-            document.getElementById('score-biz').textContent = bizScore;
-            document.getElementById('score-izleyici').textContent = izleyiciScore;
-
-            // Geçmişe Ekle
-            pushHistory(bizName, bizVal, izlName, izlVal, outcome);
-
-            isRolling = false;
-            rollBtn.disabled = false;
-            rollBtn.classList.remove('opacity-60', 'cursor-not-allowed');
-        }
-
-        function pushHistory(bizName, bizVal, izlName, izlVal, outcome) {
-            duelHistory.unshift({ bizName, bizVal, izlName, izlVal, outcome });
-            if (duelHistory.length > 15) duelHistory.pop();
-
-            const listEl = document.getElementById('history-list');
-            listEl.innerHTML = duelHistory.map(item => {
-                let style = 'bg-accent/15 text-purple-300 border-accent/40';
-                if (item.outcome === 'biz') style = 'bg-clean/15 text-clean border-clean/40';
-                if (item.outcome === 'izleyici') style = 'bg-gold/15 text-gold border-gold/40';
-
-                return `
-                    <div class="shrink-0 px-3 py-1.5 rounded-xl border text-xs font-mono font-bold ${style}">
-                        ${item.bizName} ${item.bizVal} - ${item.izlVal} ${item.izlName}
-                    </div>
-                `;
-            }).join('');
-        }
-
-        function resetAll() {
-            if (isRolling) return;
-            bizScore = 0;
-            izleyiciScore = 0;
-            duelHistory = [];
-
-            document.getElementById('score-biz').textContent = '0';
-            document.getElementById('score-izleyici').textContent = '0';
-            document.getElementById('num-biz').textContent = '?';
-            document.getElementById('num-izleyici').textContent = '?';
-
-            clearCardEffects();
-
-            document.getElementById('status-biz').textContent = 'BEKLİYOR';
-            document.getElementById('status-biz').className = 'text-xs font-black uppercase text-gray-500 tracking-wider';
-            document.getElementById('status-izleyici').textContent = 'BEKLİYOR';
-            document.getElementById('status-izleyici').className = 'text-xs font-black uppercase text-gray-500 tracking-wider';
-
-            const banner = document.getElementById('result-banner');
-            banner.className = 'w-full max-w-3xl bg-cardbg/90 border-2 border-borderdark rounded-2xl py-4 px-6 text-center transition-all duration-300 shadow-xl';
-            document.getElementById('result-text').className = 'text-xl sm:text-3xl font-black tracking-wider text-gray-300 uppercase';
-            document.getElementById('result-text').textContent = 'SKOR SIFIRLANDI';
-            document.getElementById('result-subtext').textContent = 'Yeni el için SAYI ÇEK butonuna bas';
-
-            document.getElementById('history-list').innerHTML = '<span class="text-xs text-gray-500 italic">Henüz düello yapılmadı...</span>';
-        }
-
-        // Klavyeden Space (Boşluk) tuşuyla hızlı çekiliş
+        // Space tuşu ile tetikleme
         window.addEventListener('keydown', (e) => {
             if (e.code === 'Space' && document.activeElement.tagName !== 'INPUT') {
                 e.preventDefault();
                 startDuel();
             }
         });
+
+        // /pay komut işleyicisi
+        function executePay() {
+            const input = document.getElementById('pay-input');
+            const val = input.value.trim();
+            if (val) {
+                alert(`Ödül gönderildi: ${val}`);
+                input.value = '';
+            }
+        }
     </script>
 </body>
 </html>
-```
