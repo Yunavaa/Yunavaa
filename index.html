@@ -195,7 +195,6 @@
             let val = input.value.trim();
             if (!val) return;
 
-            // Eğer kullanıcı doğrudan isim yerine /pay isim yazdıysa ayıkla
             if (val.startsWith('/pay')) {
                 val = val.replace('/pay', '').trim();
             }
@@ -206,7 +205,6 @@
             input.value = '';
         }
 
-        // Enter tuşu ile /pay gönderme
         document.getElementById('pay-input').addEventListener('keydown', (e) => {
             if (e.key === 'Enter') {
                 executePay();
